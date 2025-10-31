@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:17.6
+    container_name: fastapi-db-pg
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=fastapi
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - db_postgresql:/var/lib/postgresql
+      - db_postgresql_data:/var/lib/postgresql/data
+    networks:
+      - fastapi
+
+  redis:
+    container_name: fastapi-db-redis
+    image: redis:7.2.4
+    command: redis-server --requirepass dY5MRW2^!jxHX
+    ports:
+      - 6379:6379
+    restart: always
+    networks:
+      - fastapi
+
+  kafka:
+    image: confluentinc/cp-kafka:7.9.1
+    container_name: fastapi-db-kafka
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    networks:
+      - fastapi
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+networks:
+  fastapi:
+    driver: bridge
+
+volumes:
+  db_postgresql:
+  db_postgresql_data:
+  kafka_data:
