@@ -7,13 +7,15 @@ import json
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from sqlalchemy import select
 
 from config.DataBase import init_db, close_db
 from config.DataBase import get_engine, get_session_factory
-from config.Cache import init_redis, close_redis
+from config.Cache import init_redis, close_redis, get_redis
 from config.Queue import init_kafka, close_kafka
 from config.Queue import get_kafka_producer, create_consumer
 from models import init_models, Message
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -73,6 +75,7 @@ async def _consume_messages() -> None:
     await consumer.start()
     try:
         session_factory = await get_session_factory()
+        redis = get_redis()
         async for record in consumer:
             try:
                 data = json.loads(record.value.decode("utf-8"))
@@ -80,7 +83,33 @@ async def _consume_messages() -> None:
                     msg = Message(content=str(data.get("content", "")))
                     session.add(msg)
                     await session.commit()
+                await redis.delete("messages:all")
             except Exception:
                 continue
     finally:
         await consumer.stop()
+
+
+@app.get("/messages")
+async def list_messages():
+    redis = get_redis()
+    cache_key = "messages:all"
+    cached = await redis.get(cache_key)
+
+    if cached is not None:
+        return json.loads(cached)
+
+    session_factory = await get_session_factory()
+
+    async with session_factory() as session:
+        result = await session.execute(
+            select(Message).order_by(Message.id.desc()))
+        rows = result.scalars().all()
+        items = [{
+            "id": m.id,
+            "content": m.content,
+            "created_at": m.created_at.isoformat()
+        } for m in rows]
+
+    await redis.set(cache_key, json.dumps(items), ex=600)
+    return items
