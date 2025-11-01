@@ -1,1 +1,67 @@
 .env
+
+__pycache__/
+
+# Python bytecode and caches
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Additional env files
+.env.*
+!.env.example
+
+# Compiled extensions
+*.pyd
+*.so
+*.dll
+
+# Packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Test and coverage
+.pytest_cache/
+.coverage*
+htmlcov/
+.tox/
+.nox/
+
+# Type checkers / linters
+.mypy_cache/
+.pytype/
+.ruff_cache/
+.pyre/
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# General caches
+.cache/
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Pip metadata
+pip-wheel-metadata/
