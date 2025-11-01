@@ -32,14 +32,12 @@ async def init_kafka() -> None:
     if last_exc is not None:
         raise last_exc
 
-
 async def close_kafka() -> None:
     global _producer
 
     if _producer is not None:
         await _producer.stop()
     _producer = None
-
 
 def get_kafka_producer() -> AIOKafkaProducer:
     if _producer is None:
@@ -48,7 +46,6 @@ def get_kafka_producer() -> AIOKafkaProducer:
         )
 
     return _producer
-
 
 def create_consumer(topic: str, group_id: str) -> AIOKafkaConsumer:
     return AIOKafkaConsumer(
