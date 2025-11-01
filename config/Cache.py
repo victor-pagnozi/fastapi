@@ -18,7 +18,6 @@ async def init_redis() -> None:
         return
     params = _build_redis_params()
     _redis_client = Redis(**params)
-    # Validate connectivity with retries
     max_retries = int(os.getenv("REDIS_INIT_MAX_RETRIES", "40"))
     sleep_seconds = float(os.getenv("REDIS_INIT_SLEEP_SECONDS", "0.25"))
     last_exc: Exception | None = None
@@ -27,7 +26,7 @@ async def init_redis() -> None:
             await _redis_client.ping()
             last_exc = None
             break
-        except Exception as exc:  # pragma: no cover - defensive startup
+        except Exception as exc:
             last_exc = exc
             await asyncio.sleep(sleep_seconds)
     if last_exc is not None:

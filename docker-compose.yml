@@ -29,12 +29,11 @@ services:
     image: confluentinc/cp-kafka:7.9.1
     container_name: fastapi-db-kafka
     environment:
-      # KRaft (sem ZooKeeper)
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@fastapi-db-kafka:29093
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://fastapi-db-kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -49,6 +48,18 @@ services:
       - fastapi
     volumes:
       - kafka_data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: fastapi-kafka-ui
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      KAFKA_CLUSTERS_0_NAME: fastapi-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: fastapi-db-kafka:9092
+    networks:
+      - fastapi
 
 networks:
   fastapi:

@@ -22,7 +22,7 @@ async def init_kafka() -> None:
             await _producer.start()
             last_exc = None
             break
-        except Exception as exc:  # pragma: no cover - defensive startup
+        except Exception as exc:
             last_exc = exc
             await asyncio.sleep(sleep_seconds)
     if last_exc is not None:
