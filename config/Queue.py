@@ -6,7 +6,6 @@ from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
 _producer: Optional[AIOKafkaProducer] = None
 
-
 def _bootstrap_servers() -> str:
     return os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 
